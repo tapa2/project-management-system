@@ -17,6 +17,7 @@ distro==1.9.0
 Django==6.0.5
 django-crispy-forms==2.6
 django-environ==0.13.0
+django-extensions==4.1
 docstring_parser==0.18.0
 factory_boy==3.3.3
 Faker==40.19.1
@@ -35,7 +36,9 @@ prompt_toolkit==3.0.52
 psycopg2-binary==2.9.12
 pydantic==2.13.4
 pydantic_core==2.46.4
+pydot==4.0.1
 Pygments==2.20.0
+pyparsing==3.3.2
 pytest==9.0.3
 pytest-cov==7.1.0
 pytest-django==4.12.0
