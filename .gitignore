@@ -34,10 +34,9 @@ env/
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
-media/
+media/*
+!media/.gitkeep
 staticfiles/
-/static/
-!static/.gitkeep
 
 # Django migrations — лишаємо в репо, але ігноруємо локальні артефакти
 *.pot
