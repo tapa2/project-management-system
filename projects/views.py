@@ -46,9 +46,23 @@ class ProjectDetailView(ProjectAccessMixin, DetailView):
     context_object_name = 'project'
 
     def get_context_data(self, **kwargs):
+        from django.utils import timezone
+
+        from tasks.models import Task
+
         ctx = super().get_context_data(**kwargs)
         ctx['memberships'] = self.object.memberships.select_related('user')
-        ctx['tasks'] = self.object.tasks.select_related('assignee').all()
+        tasks = list(self.object.tasks.select_related('assignee').order_by('order', '-created_at'))
+        ctx['tasks_total'] = len(tasks)
+        ctx['kanban_columns'] = [
+            {
+                'status': value,
+                'label': label,
+                'tasks': [t for t in tasks if t.status == value],
+            }
+            for value, label in Task.Status.choices
+        ]
+        ctx['now'] = timezone.now()
         ctx['is_owner'] = self.object.owner_id == self.request.user.id
         return ctx
 

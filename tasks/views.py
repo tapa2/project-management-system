@@ -1,8 +1,13 @@
+import json
+
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.db.models import Q
+from django.db import transaction
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
+from django.views.decorators.http import require_POST
 from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
 
 from projects.models import Project
@@ -126,3 +131,41 @@ class CommentCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     def form_invalid(self, form):
         messages.error(self.request, 'Коментар порожній.')
         return redirect('tasks:detail', pk=self.task.pk)
+
+
+@login_required
+@require_POST
+def update_task_status(request, pk):
+    task = get_object_or_404(Task.objects.select_related('project'), pk=pk)
+    if not _user_has_project_access(request.user, task.project):
+        return JsonResponse({'error': 'forbidden'}, status=403)
+
+    try:
+        payload = json.loads(request.body or '{}')
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'invalid json'}, status=400)
+
+    new_status = payload.get('status')
+    new_order = payload.get('order')
+
+    valid_statuses = {choice[0] for choice in Task.Status.choices}
+    if new_status not in valid_statuses:
+        return JsonResponse({'error': 'invalid status'}, status=400)
+
+    update_fields = ['status', 'updated_at']
+    task.status = new_status
+
+    if new_order is not None:
+        try:
+            task.order = int(new_order)
+            update_fields.append('order')
+        except (TypeError, ValueError):
+            return JsonResponse({'error': 'invalid order'}, status=400)
+
+    with transaction.atomic():
+        task.save(update_fields=update_fields)
+
+    return JsonResponse({
+        'ok': True,
+        'task': {'id': task.pk, 'status': task.status, 'order': task.order},
+    })

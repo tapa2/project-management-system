@@ -1,6 +1,11 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}{{ project.name }}{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/kanban.css' %}">
+{% endblock %}
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-start mb-3">
@@ -30,39 +35,54 @@
 {% endif %}
 
 <div class="row g-4">
-    <div class="col-md-8">
+    <div class="col-lg-9">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4 class="mb-0"><i class="bi bi-list-task"></i> Задачі</h4>
+            <h4 class="mb-0"><i class="bi bi-kanban"></i> Дошка задач ({{ tasks_total }})</h4>
             <a href="{% url 'tasks:create' project.pk %}" class="btn btn-success btn-sm">
                 <i class="bi bi-plus-lg"></i> Нова задача
             </a>
         </div>
-        {% if tasks %}
-            <ul class="list-group">
-                {% for task in tasks %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <div>
-                            <a href="{% url 'tasks:detail' task.pk %}" class="fw-semibold text-decoration-none">{{ task.title }}</a>
-                            <div class="small text-muted">
-                                {{ task.get_status_display }} · {{ task.get_priority_display }}
-                                {% if task.assignee %} · виконавець: {{ task.assignee }}{% endif %}
-                                {% if task.deadline %} · дедлайн: {{ task.deadline|date:"d.m.Y H:i" }}{% endif %}
+
+        <div class="kanban-board">
+            {% for column in kanban_columns %}
+                <div class="kanban-column" data-status="{{ column.status }}">
+                    <div class="kanban-column__header">
+                        {{ column.label }} <span class="text-muted">({{ column.tasks|length }})</span>
+                    </div>
+                    <div class="kanban-list" data-status="{{ column.status }}">
+                        {% for task in column.tasks %}
+                            <div class="kanban-card{% if task.deadline and task.deadline < now and task.status != 'done' %} is-overdue{% endif %}"
+                                 data-task-id="{{ task.pk }}"
+                                 data-update-url="{% url 'tasks:update_status' task.pk %}">
+                                <div class="kanban-card__title">
+                                    <a href="{% url 'tasks:detail' task.pk %}">{{ task.title }}</a>
+                                </div>
+                                <div class="kanban-card__meta">
+                                    {% if task.assignee %}
+                                        <span><i class="bi bi-person"></i> {{ task.assignee }}</span>
+                                    {% endif %}
+                                    <span class="priority-{{ task.priority }}">
+                                        <i class="bi bi-flag-fill"></i> {{ task.get_priority_display }}
+                                    </span>
+                                    {% if task.deadline %}
+                                        <span class="deadline">
+                                            <i class="bi bi-clock"></i> {{ task.deadline|date:"d.m H:i" }}
+                                        </span>
+                                    {% endif %}
+                                </div>
                             </div>
-                        </div>
-                        <span class="badge bg-{% if task.status == 'done' %}success{% elif task.status == 'in_progress' %}primary{% elif task.status == 'review' %}info{% else %}secondary{% endif %}">
-                            {{ task.get_status_display }}
-                        </span>
-                    </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p class="text-muted">Поки що жодної задачі.</p>
-        {% endif %}
+                        {% empty %}
+                            <div class="kanban-empty">Порожньо</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
     </div>
 
-    <div class="col-md-4">
+    <div class="col-lg-3">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4 class="mb-0"><i class="bi bi-people"></i> Учасники</h4>
+            <h5 class="mb-0"><i class="bi bi-people"></i> Учасники</h5>
             {% if is_owner %}
                 <a href="{% url 'projects:add_member' project.pk %}" class="btn btn-outline-primary btn-sm">
                     <i class="bi bi-person-plus"></i>
@@ -90,4 +110,9 @@
         </ul>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>
+    <script src="{% static 'js/kanban.js' %}"></script>
 {% endblock %}
