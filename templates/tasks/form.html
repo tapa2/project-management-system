@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load crispy_forms_tags %}
+{% load crispy_forms_tags static %}
 
 {% block title %}{% if object %}Редагування задачі{% else %}Нова задача{% endif %}{% endblock %}
 
@@ -26,6 +26,16 @@
                 <form method="post">
                     {% csrf_token %}
                     {{ form|crispy }}
+
+                    <div class="mb-3">
+                        <button id="ai-generate-btn" type="button" class="btn btn-outline-warning btn-sm"
+                                data-request-url="{% url 'ai_assistant:request_description' %}"
+                                data-status-url-template="{% url 'ai_assistant:suggestion_status' 0 %}">
+                            <i class="bi bi-robot"></i> Згенерувати опис ШІ
+                        </button>
+                        <div id="ai-status" class="small mt-1 text-muted"></div>
+                    </div>
+
                     <div class="d-flex gap-2">
                         <button type="submit" class="btn btn-primary">Зберегти</button>
                         <a href="{% if object %}{% url 'tasks:detail' object.pk %}{% else %}{% url 'projects:detail' project.pk %}{% endif %}" class="btn btn-outline-secondary">Скасувати</a>
@@ -35,4 +45,8 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'js/ai_assistant.js' %}"></script>
 {% endblock %}
