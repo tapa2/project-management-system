@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}PM System — головна{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center text-center py-5">
+    <div class="col-md-8">
+        <h1 class="display-4 mb-3"><i class="bi bi-kanban"></i> Система управління проєктами</h1>
+        <p class="lead text-muted mb-4">
+            Проєкти, задачі з дедлайнами, Kanban-дошка, коментарі та ШІ-помічник для команд.
+        </p>
+        <div class="d-flex gap-2 justify-content-center">
+            <a href="{% url 'accounts:login' %}" class="btn btn-primary btn-lg">
+                <i class="bi bi-box-arrow-in-right"></i> Увійти
+            </a>
+            <a href="{% url 'accounts:register' %}" class="btn btn-outline-primary btn-lg">
+                <i class="bi bi-person-plus"></i> Реєстрація
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5 g-4">
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body text-center">
+                <i class="bi bi-folder2-open display-5 text-primary"></i>
+                <h5 class="card-title mt-3">Проєкти</h5>
+                <p class="text-muted small">Створюй проєкти й запрошуй учасників з різними ролями.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body text-center">
+                <i class="bi bi-list-task display-5 text-success"></i>
+                <h5 class="card-title mt-3">Kanban</h5>
+                <p class="text-muted small">Перетягуй задачі між колонками: До виконання, В роботі, На перевірці, Готово.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body text-center">
+                <i class="bi bi-robot display-5 text-warning"></i>
+                <h5 class="card-title mt-3">ШІ-помічник</h5>
+                <p class="text-muted small">Автогенерація опису задач і смарт-категоризація через Anthropic API.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

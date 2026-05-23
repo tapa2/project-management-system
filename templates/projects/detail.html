@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ project.name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-start mb-3">
+    <div>
+        <h2 class="mb-1">{{ project.name }}</h2>
+        <p class="text-muted mb-0">
+            Власник: <strong>{{ project.owner }}</strong> · Створено {{ project.created_at|date:"d.m.Y" }}
+            {% if not project.is_active %}<span class="badge bg-secondary ms-2">Неактивний</span>{% endif %}
+        </p>
+    </div>
+    {% if is_owner %}
+        <div class="btn-group">
+            <a href="{% url 'projects:edit' project.pk %}" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-pencil"></i> Редагувати
+            </a>
+            <a href="{% url 'projects:delete' project.pk %}" class="btn btn-outline-danger btn-sm">
+                <i class="bi bi-trash"></i> Видалити
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+{% if project.description %}
+    <div class="card mb-4">
+        <div class="card-body">{{ project.description|linebreaksbr }}</div>
+    </div>
+{% endif %}
+
+<div class="row g-4">
+    <div class="col-md-8">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="mb-0"><i class="bi bi-list-task"></i> Задачі</h4>
+            <a href="{% url 'tasks:create' project.pk %}" class="btn btn-success btn-sm">
+                <i class="bi bi-plus-lg"></i> Нова задача
+            </a>
+        </div>
+        {% if tasks %}
+            <ul class="list-group">
+                {% for task in tasks %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <a href="{% url 'tasks:detail' task.pk %}" class="fw-semibold text-decoration-none">{{ task.title }}</a>
+                            <div class="small text-muted">
+                                {{ task.get_status_display }} · {{ task.get_priority_display }}
+                                {% if task.assignee %} · виконавець: {{ task.assignee }}{% endif %}
+                                {% if task.deadline %} · дедлайн: {{ task.deadline|date:"d.m.Y H:i" }}{% endif %}
+                            </div>
+                        </div>
+                        <span class="badge bg-{% if task.status == 'done' %}success{% elif task.status == 'in_progress' %}primary{% elif task.status == 'review' %}info{% else %}secondary{% endif %}">
+                            {{ task.get_status_display }}
+                        </span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-muted">Поки що жодної задачі.</p>
+        {% endif %}
+    </div>
+
+    <div class="col-md-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="mb-0"><i class="bi bi-people"></i> Учасники</h4>
+            {% if is_owner %}
+                <a href="{% url 'projects:add_member' project.pk %}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-person-plus"></i>
+                </a>
+            {% endif %}
+        </div>
+        <ul class="list-group">
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-star-fill text-warning"></i> {{ project.owner }}</span>
+                <span class="badge bg-primary">Власник</span>
+            </li>
+            {% for m in memberships %}
+                {% if m.user_id != project.owner_id %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>{{ m.user }}</span>
+                        <span>
+                            <span class="badge bg-secondary me-2">{{ m.get_role_display }}</span>
+                            {% if is_owner %}
+                                <a href="{% url 'projects:remove_member' m.pk %}" class="text-danger small">×</a>
+                            {% endif %}
+                        </span>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}
