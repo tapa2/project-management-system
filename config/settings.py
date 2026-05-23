@@ -128,11 +128,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # ---------------------------------------------------------------------------
 # Auth (кастомна User-модель з'явиться на етапі 3)
 # ---------------------------------------------------------------------------
-# AUTH_USER_MODEL = 'accounts.User'
+AUTH_USER_MODEL = 'accounts.User'
 
-LOGIN_URL = 'accounts:login'
-LOGIN_REDIRECT_URL = 'core:home'
-LOGOUT_REDIRECT_URL = 'core:home'
+# Запрацює після етапу 4 (accounts:login) і етапу 5 (core:home):
+# LOGIN_URL = 'accounts:login'
+# LOGIN_REDIRECT_URL = 'core:home'
+# LOGOUT_REDIRECT_URL = 'core:home'
 
 # ---------------------------------------------------------------------------
 # Celery / Redis (повне налаштування — етап 7)
