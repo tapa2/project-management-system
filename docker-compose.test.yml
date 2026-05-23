@@ -1,0 +1,23 @@
+# =============================================================================
+# docker-compose.test.yml — окремий Postgres для pytest на порту 5433
+#   Підіймати: docker compose -f docker-compose.test.yml up -d
+#   Зупиняти:  docker compose -f docker-compose.test.yml down -v
+# =============================================================================
+
+services:
+  test-db:
+    image: postgres:16-alpine
+    container_name: pms-test-db
+    environment:
+      POSTGRES_DB: pms_test
+      POSTGRES_USER: pms_user
+      POSTGRES_PASSWORD: pms_password
+    ports:
+      - "5433:5432"
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pms_user -d pms_test"]
+      interval: 3s
+      timeout: 3s
+      retries: 15
