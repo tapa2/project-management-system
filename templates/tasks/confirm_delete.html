@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}Видалення задачі{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-danger shadow-sm">
+            <div class="card-body">
+                <h4 class="text-danger"><i class="bi bi-exclamation-triangle"></i> Видалити задачу?</h4>
+                <p class="mb-4">
+                    Ви точно хочете видалити <strong>{{ object.title }}</strong>?
+                    Коментарі та вкладення зникнуть назавжди.
+                </p>
+                <form method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Так, видалити</button>
+                    <a href="{% url 'tasks:detail' object.pk %}" class="btn btn-outline-secondary">Скасувати</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

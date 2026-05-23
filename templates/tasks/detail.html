@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ task.title }}{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'projects:list' %}">Проєкти</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'projects:detail' task.project.pk %}">{{ task.project.name }}</a></li>
+        <li class="breadcrumb-item active">{{ task.title }}</li>
+    </ol>
+</nav>
+
+<div class="row g-4">
+    <div class="col-md-8">
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <h3 class="mb-0">{{ task.title }}</h3>
+                    {% if can_edit %}
+                        <div class="btn-group">
+                            <a href="{% url 'tasks:edit' task.pk %}" class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="{% url 'tasks:delete' task.pk %}" class="btn btn-outline-danger btn-sm">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+
+                {% if task.description %}
+                    <div class="mb-3">{{ task.description|linebreaksbr }}</div>
+                {% else %}
+                    <p class="text-muted fst-italic">Опис не заповнено.</p>
+                {% endif %}
+
+                {% if task.labels.all %}
+                    <div class="mb-3">
+                        {% for label in task.labels.all %}
+                            <span class="badge" style="background-color: {{ label.color }};">{{ label.name }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <h5><i class="bi bi-chat-left-text"></i> Коментарі ({{ comments|length }})</h5>
+        {% if comments %}
+            <div class="list-group mb-3">
+                {% for c in comments %}
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between">
+                            <strong>{{ c.author }}</strong>
+                            <small class="text-muted">{{ c.created_at|date:"d.m.Y H:i" }}</small>
+                        </div>
+                        <div class="mt-1">{{ c.text|linebreaksbr }}</div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-muted">Поки що жодного коментаря.</p>
+        {% endif %}
+
+        {% if can_edit %}
+            <form method="post" action="{% url 'tasks:comment_create' task.pk %}">
+                {% csrf_token %}
+                {{ comment_form|crispy }}
+                <button type="submit" class="btn btn-primary btn-sm">
+                    <i class="bi bi-send"></i> Надіслати
+                </button>
+            </form>
+        {% endif %}
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h6 class="text-muted text-uppercase small mb-3">Деталі</h6>
+                <dl class="row mb-0">
+                    <dt class="col-5">Статус</dt>
+                    <dd class="col-7">
+                        <span class="badge bg-{% if task.status == 'done' %}success{% elif task.status == 'in_progress' %}primary{% elif task.status == 'review' %}info{% else %}secondary{% endif %}">
+                            {{ task.get_status_display }}
+                        </span>
+                    </dd>
+
+                    <dt class="col-5">Пріоритет</dt>
+                    <dd class="col-7">{{ task.get_priority_display }}</dd>
+
+                    <dt class="col-5">Виконавець</dt>
+                    <dd class="col-7">{{ task.assignee|default:'—' }}</dd>
+
+                    <dt class="col-5">Автор</dt>
+                    <dd class="col-7">{{ task.created_by|default:'—' }}</dd>
+
+                    <dt class="col-5">Дедлайн</dt>
+                    <dd class="col-7">{{ task.deadline|date:"d.m.Y H:i"|default:'—' }}</dd>
+
+                    <dt class="col-5">Створено</dt>
+                    <dd class="col-7">{{ task.created_at|date:"d.m.Y H:i" }}</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
