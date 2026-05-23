@@ -130,10 +130,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # ---------------------------------------------------------------------------
 AUTH_USER_MODEL = 'accounts.User'
 
-# Запрацює після етапу 4 (accounts:login) і етапу 5 (core:home):
-# LOGIN_URL = 'accounts:login'
-# LOGIN_REDIRECT_URL = 'core:home'
-# LOGOUT_REDIRECT_URL = 'core:home'
+LOGIN_URL = 'accounts:login'
+LOGIN_REDIRECT_URL = 'accounts:profile'
+LOGOUT_REDIRECT_URL = 'accounts:login'
 
 # ---------------------------------------------------------------------------
 # Celery / Redis (повне налаштування — етап 7)

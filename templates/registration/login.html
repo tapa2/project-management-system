@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Вхід — PM System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h3 class="card-title mb-4 text-center"><i class="bi bi-box-arrow-in-right"></i> Вхід у систему</h3>
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <button type="submit" class="btn btn-primary w-100">Увійти</button>
+                </form>
+                <hr>
+                <p class="text-center mb-0">
+                    Ще нема акаунту?
+                    <a href="{% url 'accounts:register' %}">Зареєструватися</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

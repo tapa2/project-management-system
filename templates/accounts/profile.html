@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Профіль — {{ profile_user.username }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-4">
+                    {% if profile_user.avatar %}
+                        <img src="{{ profile_user.avatar.url }}" class="rounded-circle me-3" width="80" height="80" alt="avatar">
+                    {% else %}
+                        <i class="bi bi-person-circle text-secondary me-3" style="font-size: 5rem;"></i>
+                    {% endif %}
+                    <div>
+                        <h3 class="mb-0">{{ profile_user.get_full_name|default:profile_user.username }}</h3>
+                        {% if profile_user.position %}
+                            <p class="text-muted mb-0">{{ profile_user.position }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <dl class="row">
+                    <dt class="col-sm-3">Username</dt>
+                    <dd class="col-sm-9">{{ profile_user.username }}</dd>
+
+                    <dt class="col-sm-3">Email</dt>
+                    <dd class="col-sm-9">{{ profile_user.email|default:'—' }}</dd>
+
+                    <dt class="col-sm-3">Про себе</dt>
+                    <dd class="col-sm-9">{{ profile_user.bio|default:'—'|linebreaksbr }}</dd>
+
+                    <dt class="col-sm-3">Зареєстровано</dt>
+                    <dd class="col-sm-9">{{ profile_user.date_joined|date:"d F Y, H:i" }}</dd>
+                </dl>
+
+                <a href="{% url 'accounts:profile_edit' %}" class="btn btn-outline-primary">
+                    <i class="bi bi-pencil"></i> Редагувати
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
