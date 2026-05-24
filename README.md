@@ -297,10 +297,9 @@ erDiagram
 
 ## Документація
 
-- [`ROADMAP.md`](ROADMAP.md) — план розробки з 13 етапів
 - [`docs/REPORT.md`](docs/REPORT.md) — звіт за проєктом (для експорту в PDF/DOCX)
 - [`docs/er_diagram.dot`](docs/er_diagram.dot) — ER-діаграма всіх моделей
-- [`docs/er_app_models.dot`](docs/er_app_models.dot) — лише наші apps (без auth/admin)
+- [`docs/er_app_models.dot`](docs/er_app_models.dot) — лише apps (без auth/admin)
 
 ---
 
